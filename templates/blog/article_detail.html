@@ -1,0 +1,101 @@
+{% extends 'common_layout/blog_base.html' %}
+{% load blog_tags %}
+{% load cache %}
+
+{% block header %}
+    <title>{{ article.title }} | {{ SITE_DESCRIPTION }}</title>
+    <meta property="og:type" content="article"/>
+    <meta property="og:title" content="{{ article.title }}"/>
+    <meta property="og:description" content="{{ article.body|custom_markdown|striptags|truncatewords:20 }}"/>
+    <meta property="og:url"
+          content="{{ article.get_full_url }}"/>
+    <meta property="article:published_time" content="{% datetimeformat article.pub_time %}"/>
+    <meta property="article:modified_time" content="{% datetimeformat article.pub_time %}"/>
+    <meta property="article:author" content="{{ article.author.get_full_url }}"/>
+    <meta property="article:section" content="{{ article.category.name }}"/>
+    {% for t in article.tags.all %}
+        <meta property="article:tag" content="{{ t.name }}"/>
+    {% endfor %}
+    <meta property="og:site_name" content="{{ SITE_NAME }}"/>
+{% endblock %}
+
+
+{% block content %}
+
+<div id="primary" class="col-md-9 content-area Content">
+<div class="container-fluid col-md-12 left-title" style="margin-bottom:20px !important;padding:0px;">                              
+<h4 class="title-h2">文章全文</h4>                                         
+</div>
+	<main id="main" class="site-main" role="main">
+		{% load_article_detail article False user %}
+
+		{% if article.type == 'a' %}
+			{% if next_article or prev_article %}
+			<div class="post-navigation">
+				<nav class="navigation" role="navigation">
+					<h2 class="screen-reader-text">Post navigation</h2>
+					<div class="nav-links">
+						<div class="row">
+						
+						<div class="col-md-6 prev-post">
+							{% if next_article %}
+							<a href="{{ next_article.get_absolute_url }}">
+							<span class="next-prev-text" style="font-size: 0.7em;">
+							<i class="fa fa-angle-left" style="font-size: 1.2em;"></i> PREVIOUS</span>
+							<br>{{ next_article.title }}</a>
+							{% endif %}
+						</div>
+
+						<div class="col-md-6 next-post">
+							{% if prev_article %}
+							<a href="{{ prev_article.get_absolute_url }}">
+							<span class="next-prev-text" style="font-size: 0.7em;"> NEXT
+							<i class="fa fa-angle-right" style="font-size: 1.2em;"></i></span>
+							<br>{{ prev_article.title }}</a>
+							{% endif %}
+						</div>
+
+						</div>
+					</div>
+				</nav>
+			</div>
+			{% endif %}
+		{% endif %}
+
+
+
+		{% if article.comment_status == "o" and OPEN_SITE_COMMENT %}
+		    {% comment %}{% load comments_tags %}
+		        {% load_post_comment article from %}{% endcomment %}
+
+
+		    {% include 'comments/tags/comment_list.html' %}
+
+
+		    {% if user.is_authenticated %}
+		        {% include 'comments/tags/post_comment.html' %}
+		    {% else %}
+		        <div class="comments-area">
+		            <h4 class="comment-meta">您还没有登录，请您<a
+		                    href="{% url "account:login" %}?next={{ request.get_full_path }}">登录</a>后发表评论。</h4>
+
+		            {% load oauth_tags %}
+		            {% load_oauth_applications request %}
+
+		        </div>
+		    {% endif %}
+		{% endif %}
+	</main>
+</div>
+
+
+
+{% endblock content %}
+
+
+
+
+{% block sidebar %}
+	{% load_sidebar user %}
+{% endblock sidebar %}
+

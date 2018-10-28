@@ -1,0 +1,51 @@
+<header id="masthead"  role="banner">
+    <nav id="site-navigation" class="main-navigation navbar-fixed-top navbar-left" role="navigation">
+    <div class="container" id="navigation_menu">
+      <div class="navbar-header">
+        <button type="button" class="menu-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span> 
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="{{ SITE_BASE_URL }}">{{ SITE_NAME }}</a>
+      </div>
+      <div class="collapse navbar-collapse navbar-ex1-collapse">
+      <ul id="menu-top_nav" class="primary-menu">
+        <li class="menu-item menu-item-type-custom menu-item-object-custom {% if tag_name == None and article.title == None %}current_page_item{% endif %} menu-item-0">
+          <a href="{{ SITE_BASE_URL }}">首页</a>
+        </li>
+
+        {% load blog_tags %}
+        {% query nav_category_list parent_category=None as root_categorys %}
+        {% for node in root_categorys %}
+                {% include 'common_layout/nav_node.html' %}
+        {% endfor %}
+
+        
+        {% if nav_pages %}
+            {% for node in nav_pages %}
+                <li id="menu-item-{{ node.pk }}" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-{{ node.pk }} {% if article.title == node.title %}current_page_item{% endif %}">
+                    <a href="{{ node.get_absolute_url }}">{{ node.title }}</a>
+                </li>
+            {% endfor %}
+        {% endif %}
+
+        <li class="menu-item menu-item-type-custom menu-item-object-custom menu-menu-home menu-item-{{ node.pk }} {% if tag_name == '文章归档' %}current_page_item{% endif %}">
+            <a href="{% url 'blog:archives' %}">文章归档</a>
+        </li>
+      </ul>
+      </div>
+    </div>
+    </nav>
+
+    <div id="cc_spacer"></div>
+    <div class="site-header">
+      <div class="site-branding">
+        <a class="home-link" href="{{ SITE_BASE_URL }}" title="{{ SITE_NAME }}" rel="home">
+          <h1 class="site-title">{{ SITE_NAME }}</h1>
+          <h2 class="site-description">{{ SITE_DESCRIPTION }}</h2>
+        </a>
+      </div>
+    </div>
+  </header>

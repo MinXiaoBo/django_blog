@@ -1,0 +1,99 @@
+{% load static %}
+{% load cache %}
+{% load compress %}
+<!DOCTYPE html>
+<!--[if IE 8]>
+<html id="ie8" lang="zh-CN">
+<![endif]-->
+<!--[if !(IE 8) ]><!-->
+<html lang="zh-CN">
+<!--<![endif]-->
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width" />
+	{% block header %}{% endblock header %}
+	{% compress css %}
+		<link rel='stylesheet' href="{% static 'blog/css/bootstrap.min.css' %}" type='text/css' media='all'/>
+		<link rel='stylesheet' href="{% static 'blog/css/font-awesome.min.css' %}" type='text/css' media='all'/>
+		<link rel='stylesheet' href="{% static 'blog/css/nisarg.css' %}" type='text/css' media='all' />
+		<link rel='stylesheet' href="{% static 'blog/css/myblog.css' %}" type='text/css' media='all' />
+		<link rel="stylesheet" href="{% static 'blog/css/nprogress.css' %}">
+
+		{% block extra_style %}{% endblock extra_style %}
+	
+	{% endcompress %}
+	
+</head>
+
+<body class="home blog">
+<div id="page" class="hfeed site">
+
+
+    {% include "common_layout/nav_common.html" %}
+
+	
+<div id="content" class="site-content">
+	<div class="container">
+	<div class="row">
+		{% block content %}{% endblock content %}
+
+        {% cache 36000 sidebar request.user.username %}
+            {% block sidebar %}
+            {% endblock %}
+        {% endcache %}
+	</div>
+	</div>
+</div>
+
+
+
+{% include "common_layout/foot_common.html" %}
+<div id="rocket" class="show" title="点我返回顶部"></div>
+</body>
+</html>
+<footer>
+	{% compress js %}
+		<script type="text/javascript" src="{% static 'blog/js/jquery.min.js' %}"></script>
+		<script type="text/javascript" src="{% static 'blog/js/bootstrap.min.js' %}"></script>
+
+		<!--导航条-->
+		<script type='text/javascript' src="{% static 'blog/js/navigation.js' %}"></script>
+		<script type='text/javascript' src="{% static 'blog/js/skip-link-focus-fix.js' %}"></script>
+
+		<!--进度条-->
+		<script type="text/javascript" src="{% static 'blog/js/nprogress.js' %}"></script>
+
+		<!--sidebar-->
+		<script type="text/javascript" src="{% static 'blog/js/theia-sticky-sidebar.js' %}"></script>
+		<script type="text/javascript" src="{% static 'blog/js/test.js' %}"></script>
+
+		<!--nisarg-->
+		<script type='text/javascript' src="{% static 'blog/js/nisarg.js' %}"></script>
+	    {% block compress_js %}
+	    <script type="text/javascript">
+	    	$(document).ready(function() {
+			$('.Content, .rightSidebar')
+			    .theiaStickySidebar({
+			        additionalMarginTop: 30
+			    });
+			});
+
+			function do_reply(parentid) {
+			    $("#id_parent_comment_id").val(parentid)
+			    $("#commentform").appendTo($("#div-comment-" + parentid));
+			    $("#reply-title").hide();
+			    $("#cancel_comment").show();
+			    $("#cancel-comment-reply-link").show();
+			}
+
+			function cancel_reply() {
+			    $("#reply-title").show();
+			    $("#cancel_comment").hide();
+			    $("#id_parent_comment_id").val('')
+			    $("#commentform").appendTo($("#respond"));
+			}
+			$("img").addClass("img-responsive");
+	    </script>
+	    {% endblock %}
+	{% endcompress %}
+</footer>

@@ -1,0 +1,19 @@
+{% extends 'common_layout/blog_base.html' %}
+{% load blog_tags %}
+{% load cache %}
+{% block header %}
+
+    <title>文章归档 | {{ SITE_DESCRIPTION }}</title>
+    <meta name="description" content="{{ SITE_SEO_DESCRIPTION }}"/>
+    <meta name="keywords" content="{{ SITE_KEYWORDS }}"/>
+    <meta property="og:type" content="blog"/>
+    <meta property="og:title" content="{{ SITE_NAME }}"/>
+    <meta property="og:description" content="{{ SITE_DESCRIPTION }}"/>
+    <meta property="og:url" content="{{ SITE_BASE_URL }}"/>
+    <meta property="og:site_name" content="{{ SITE_NAME }}"/>
+
+{% endblock %}
+{% block content %}
+    <iframe src="{% url 'blog:archives' %}" width="100%" height="100%" scrolling="no" frameborder="0"></iframe>
+{% endblock %}
+

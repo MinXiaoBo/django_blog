@@ -1,0 +1,56 @@
+萌萌的小动物
+root
+&lt;p&gt;&lt;img alt=&quot;16010.jpg&quot; src=&quot;/media/uploads/2018/05/16/16010.jpg&quot; width=&quot;700&quot; height=&quot;393.7142857142857&quot;&gt;&lt;/p&gt;&lt;p&gt;&lt;img alt=&quot;393569.jpg&quot; src=&quot;/media/uploads/2018/05/16/393569.jpg&quot; width=&quot;700&quot; height=&quot;393.7142857142857&quot;&gt;&lt;/p&gt;&lt;p&gt;小动物真的很可爱!&lt;br&gt;&lt;/p&gt;Django 国际化简介
+root
+&lt;p&gt;Django 的开发和维护者对 Django 框架本身进行了完全国际化，我们可以在 ./Python2.5/site-packages/django/conf/locale/ 找到相关的语言文件。目前 Django-1.2.1 带着 52 个不同的本地化语言文件发行的，使用户能够方便的使用它现有的管理界面。Django 国际化的本质就是开发者对需要翻译的字符串进行标记，并对字符串进行相应的翻译。当用户访问该 Web 时，Django 内部框架根据用户使用偏好进行 Web 呈现。Django 国际化使用的翻译模块是使用 Python 自带的 gettext 标准模块。通过一个到 GNU gettext 消息目录库的接口，这个模块为 Python 程序提供了国际化 (I18N) 和本地化 (L10N)。开发人员和翻译人员需要完成一下 3 个步骤：1. 第一步：在 Python 代码和模板中嵌入待翻译的字符串，2. 第二步：把那些字符串翻译成需要支持的语言，并进行相应的编译3. 第三步：在 Django settings 文件中激活本地中间件，下面我们将通过这个几个步骤，介绍两个实例，然后在每个实例后结合 Django 代码来向读者介绍 Django 国际化的原理。本文环境：CentOS release 5.3 (Final)，Python 2.5.5 ， gettext 版本为 gettext-0.14.6-4.el5，浏览器为 Fixfox 3.6.3., Django-1.2.1。请前往 &lt;a href=&quot;http://www.djangoproject.com/download/&quot; rel=&quot;nofollow&quot;&gt;http://www.djangoproject.com/download/&lt;/a&gt;下载并安装 Django。读者最好能边阅读本文，边在计算机上进行操作，达到最佳学习效果。因此，需要读者具备以下技能：熟悉基本的 Linux 操作命令熟悉 Python 语法，对编写 Django 应用程序所有了解。本文附带相关源代码，直接下载并解压缩到配置好 Django 的环境中，就可以运行看到效果。&lt;br&gt;&lt;/p&gt;dajngo
+root
+&lt;pre&gt;&lt;code class=&quot;lang-python&quot;&gt;from django.conf.urls import url, include
+from django.contrib import admin
+from django.contrib.sitemaps.views import sitemap
+from DjangoBlog.sitemap import StaticViewSitemap, ArticleSiteMap, CategorySiteMap, TagSiteMap, UserSiteMap
+from DjangoBlog.feeds import DjangoBlogFeed
+from django.views.decorators.cache import cache_page
+from django.conf import settings
+from django.conf.urls.static import static
+from DjangoBlog.admin_site import admin_site
+
+sitemaps = {
+    &#39;blog&#39;: ArticleSiteMap,
+    &#39;Category&#39;: CategorySiteMap,
+    &#39;Tag&#39;: TagSiteMap,
+    &#39;User&#39;: UserSiteMap,
+    &#39;static&#39;: StaticViewSitemap
+}
+
+handler404 = &#39;blog.views.page_not_found_view&#39;
+handler500 = &#39;blog.views.server_error_view&#39;
+handle403 = &#39;blog.views.permission_denied_view&#39;
+urlpatterns = [
+    url(r&#39;^admin/&#39;, admin_site.urls),
+    url(r&#39;&#39;, include(&#39;blog.urls&#39;, namespace=&#39;blog&#39;)),
+
+    url(r&#39;&#39;, include(&#39;comments.urls&#39;, namespace=&#39;comment&#39;)),
+    url(r&#39;&#39;, include(&#39;accounts.urls&#39;, namespace=&#39;account&#39;)),
+    url(r&#39;&#39;, include(&#39;oauth.urls&#39;, namespace=&#39;oauth&#39;)),
+
+    #SiteMap
+    url(r&#39;^sitemap\.xml$&#39;, sitemap, {&#39;sitemaps&#39;: sitemaps},
+        name=&#39;django.contrib.sitemaps.views.sitemap&#39;),
+
+    #RSS
+    url(r&#39;^feed/$&#39;, DjangoBlogFeed()),
+
+    url(r&#39;^search&#39;, include(&#39;haystack.urls&#39;), name=&#39;search&#39;),
+
+    url(r&#39;&#39;, include(&#39;servermanager.urls&#39;, namespace=&#39;servermanager&#39;)),
+
+    #owntracks
+    url(r&#39;&#39;, include(&#39;owntracks.urls&#39;, namespace=&#39;owntracks&#39;))
+] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+&lt;br&gt;&lt;/code&gt;&lt;/pre&gt;Django 国际化实例及原理分析
+root
+&lt;p&gt;当 Web 服务搭建好以后，可以接收来自全球不同国家用户访问。这样就要求开发人员调整软件，使之能适用于不同的语言，即国际化和本地化。国际化 --  Internationalization，i 和 n 之间有 18 个字母，简称 I18N,。本地化 -- localization， l 和 n 之间有 10 个字母，简称 L10N。国际化意味着 Web 产品有适用于任何地方的潜力，针对程序开发人员；本地化则是指使一个国际化的程序为了在某个特定地区使用而进行实际翻译的过程，针对翻译人员而言。Django 提供了非常强大的翻译机制，开发者一旦理解它的实现，就能减少编码量，提高开发效率。本文通过两个 Django 国际化实例循序渐进地介绍在 Django 环境里进行 Web 程序国际化和本地化开发的相关方法和知识。并结合 Django 国际化现有代码进行分析，向读者阐述 Django 国际化的原理与内部实现。学习本文，可以很好的掌握国际化 Django 程序的技术。当 Web 服务搭建好以后，可以接收来自全球不同国家用户访问。这样就要求开发人员调整软件，使之能适用于不同的语言，即国际化和本地化。国际化 --  Internationalization，i 和 n 之间有 18 个字母，简称 I18N,。本地化 -- Localization， l 和 n 之间有 10 个字母，简称 L10N。国际化意味着 Web 产品有适用于任何地方的潜力，针对程序开发人员；本地化则是指使一个国际化的程序为了在某个特定地区使用而进行实际翻译的过程，针对翻译人员而言。Django 提供了非常强大的翻译机制，开发者一旦理解它的实现，就能减少编码量，提高开发效率。&lt;br&gt;&lt;/p&gt;关于博主
+root
+&lt;p&gt;&lt;b&gt;乌云ID：只为花开linux系统、网络安全爱好者.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;&lt;b&gt;湖北理工学院2015在校大学生.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;&lt;b&gt;联系邮箱：465728296@qq.com&lt;/b&gt;&lt;/p&gt;&lt;p&gt;&lt;b&gt;QQ：465728296&lt;/b&gt;&lt;/p&gt;&lt;p&gt;&lt;b&gt;&lt;img alt=&quot;092958cz6jt6jw2vmmjmsc.jpg&quot; src=&quot;/media/uploads/2018/05/15/092958cz6jt6jw2vmmjmsc_gMaA0Rw.jpg&quot; width=&quot;700&quot; height=&quot;393.6231884057971&quot;&gt;&lt;br&gt;&lt;/b&gt;&lt;/p&gt;针对 Python 代码的国际化实例及原理分析
+root
+&lt;p&gt;对 Django 中 Python 代码进行国际化主要用到 ugettext()，gettext_noop()，gettext_lazy() 和 ungettext() 等函数。在本 Django 应用程序实例中，主要 Python 代码都集中在 models.py 和 views.py。 我们将 ugettext() 使用对 views.py 中的相关字符串进行实例化。接着，我们将会结合 Django 代码对整个过程的原理实现做详细的介绍。一个简单的 Python Web 程序首先在 /home/jerry/ 目录下 , 创建名为 testsite 的 Project，请参考清单 1:清单 1. 创建一名为 testsite 的 project1234[root@localhost jerry]# django-admin.py startproject testsite [root@localhost jerry]# cd testsite/ [root@localhost testsite]# ls __init__.py&amp;nbsp; manage.py&amp;nbsp; settings.py&amp;nbsp; urls.py接着，在 /home/jerry/testsite 目录下创建一个名为 test1 的 Django App, 请参看清单 2。清单 2. 创建名为 test1 的 Django App1234[root@localhost testsite]# Python manage.py startapp test1 [root@localhost testsite]# ls __init__.py&amp;nbsp; __init__.pyc&amp;nbsp; manage.py&amp;nbsp; settings.py&amp;nbsp; settings.pyc&amp;nbsp; test1&amp;nbsp; urls.py [root@localhost testsite]#cd test1接着，在 test1 的 views.py 中添加代码获取今天周期几，具体代码参看清单 3。清单 3. test1 的 views.py 中的代码12345678910111213141516[root@localhost test1]# vim views.py &amp;nbsp;&amp;nbsp;# Create your views here. &amp;nbsp;from django.http import HttpResponse &amp;nbsp;import time &amp;nbsp;&amp;nbsp;def test1_view(request): &amp;nbsp;# 获得系统本地时间，返回的格式是 UTC 中的 struct_time 数据&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;t&amp;nbsp; = time.localtime() &amp;nbsp;# 第 6 个元素是 tm_wday , 范围为 [0,6], 星期一 is 0 &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;n&amp;nbsp; = t[6] &amp;nbsp;# 星期一到星期日字符串weekdays = [&#39;Monday&#39;, &#39;Tuesday&#39;, &#39;Wednesday&#39;, &#39;Thursday&#39;, &#39;Friday&#39;, &#39;Saturday&#39;, &#39;Sunday&#39;] &amp;nbsp;# 返回一个 HttpResponse、，这段代码将用来返回服务器系统上是星期几。&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;return HttpResponse(weekdays[n])然后配置 URL, 在 url.py 增加用户访问 test1_view 的 url, 具体请参看清单 4。清单 4. test1_view 的 url 配置1234567891011[root@localhost testsite]# vim urls.py &amp;nbsp;from testsite.test1 import views &amp;nbsp;&amp;nbsp;urlpatterns = patterns(&#39;&#39;, &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;…&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;(r&#39;^test1_view$&#39;, views.test1_view), &amp;nbsp;) &amp;nbsp;在 testsite 中，setting.py 中默认的语言设置为 en-us: &amp;nbsp;&amp;nbsp;LANGUAGE_CODE = &#39;en-us&#39;在更新 url.py 和 setting.py 后，在 /home/jerry/testsite 目录下启动服务，具体参看清单 5：清单 5. 启动 testsite 服务1root@localhost testsite]# Python manage.py runserver 0.0.0.0:8080当启动服务没有错误提示，就可以在在浏览器中输入 Web 服务地址 : &lt;a href=&quot;http://192.168.174.128:8080/test1_view&quot; rel=&quot;nofollow&quot;&gt;http://192.168.174.128:8080/test1_view&lt;/a&gt;，就会看到英文星期几，具体见图 1:图 1. test1 未国际化时的显示结果&lt;br&gt;&lt;/p&gt;�vu&�H

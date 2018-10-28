@@ -1,0 +1,43 @@
+{% extends 'common_layout/blog_base.html' %}
+{% load blog_tags %}
+{% block header %}
+    <title>{{ SITE_NAME }} | {{ SITE_DESCRIPTION }}</title>
+    <meta name="description" content="{{ SITE_SEO_DESCRIPTION }}"/>
+    <meta name="keywords" content="{{ SITE_KEYWORDS }}"/>
+    <meta property="og:type" content="blog"/>
+    <meta property="og:title" content="{{ SITE_NAME }}"/>
+    <meta property="og:description" content="{{ SITE_DESCRIPTION }}"/>
+    <meta property="og:url" content="{{ SITE_BASE_URL }}"/>
+    <meta property="og:site_name" content="{{ SITE_NAME }}"/>
+{% endblock %}
+{% block content %}
+<div id="primary" class="col-md-9 content-area Content">
+{% if query or query == "" %}
+    <div class="container-fluid col-md-12 left-title" style="margin-bottom:20px !important;padding:0px;">                              
+    <h4 class="title-h2">文章搜索 <span class="glyphicon glyphicon-hand-right"></span><span style="color: red;text-shadow:5px 5px 5px red;">&nbsp&nbsp&nbsp{{ query|upper }}</span></h4>                                         
+    </div>
+{% endif %}
+    <main id="main" class="site-main" role="main">
+            
+            {% if query and page.object_list %}
+                {% for article in page.object_list %}
+                    {% load_article_detail article.object True user %}
+                {% endfor %}
+
+            {% else %}
+            <article id="post-21"  class="post-content post-21 post type-post status-publish format-standard hentry category-4 tag-5" style="padding:60px 0 60px 0;">
+                <header class="entry-header">
+                    <h3 class="archive-title">哎呀，关键字：<span style="color: red;">{{ query }}</span>没有找到结果，要不换个词再试试？</h3>
+                </header>
+            </article>
+            {% endif %}
+    </main>
+</div>
+{% endblock %}
+
+
+{% block sidebar %}
+    {% load_sidebar request.user %}
+{% endblock %}
+
+

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+pid=`cat ./script/uwsgi.pid`
+kill -9 $pid
+uwsgi3 ./uwsgi.ini

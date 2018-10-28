@@ -1,0 +1,28 @@
+{% load blog_tags %}
+{% load comments_tags %}
+<div class="post-comments" style="padding-bottom: 0px;">             
+    <div id="comments" class="comments-area">
+        <h2 style="" class="comments-title">{{ comment_count }} thought on “ <span>{{ article.title }}</span> ”</h2>
+        {% if article_comments %}
+            <div id="commentlist-container col-md-12" class="comment-tab" style="display: block;padding:0px;">
+                <ol class="commentlist" style="list-style: none;">
+                    {% query article_comments parent_comment=None as parent_comments %}
+                    {% for comment in parent_comments %}
+                        {% show_comment_item comment False %}
+                        {% parse_commenttree article_comments comment as childcomments %}
+                        {% if childcomments %}
+                            <ul class="children">
+                                {% for child in childcomments %}
+                                    {% show_comment_item child True %}
+
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    {% endfor %}
+                </ol>
+            </div>
+        {% endif %}
+    <div class="col-md-12">
+        <hr>
+    </div>
+

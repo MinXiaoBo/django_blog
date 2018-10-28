@@ -1,0 +1,79 @@
+{% extends 'common_layout/blog_base.html' %}
+{% load blog_tags %}
+{% load cache %}
+
+{% block header %}
+    {% if tag_name %}
+        <title>{{ page_type }}:{{ tag_name }} | {{ SITE_DESCRIPTION }}</title>
+        {% comment %}<meta name="description" content="{{ page_type }}:{{ tag_name }}"/>{% endcomment %}
+    {% else %}
+        <title>{{ SITE_NAME }} | {{ SITE_DESCRIPTION }}</title>
+    {% endif %}
+    <meta name="description" content="{{ SITE_SEO_DESCRIPTION }}"/>
+    <meta name="keywords" content="{{ SITE_KEYWORDS }}"/>
+    <meta property="og:type" content="blog"/>
+    <meta property="og:title" content="{{ SITE_NAME }}"/>
+    <meta property="og:description" content="{{ SITE_DESCRIPTION }}"/>
+    <meta property="og:url" content="{{ SITE_BASE_URL }}"/>
+    <meta property="og:site_name" content="{{ SITE_NAME }}"/>
+{% endblock %}
+
+
+{% block content %}
+<div id="primary" class="col-md-9 content-area Content">
+
+	{% if page_type and tag_name %}
+	    <div class="container-fluid col-md-12 left-title" style="margin-bottom:20px !important;padding:0px;">                              
+		<h4 class="title-h2">{{ page_type }} <span class="glyphicon glyphicon-hand-right"></span><span>&nbsp&nbsp&nbsp{{ tag_name|upper }}</span></h4>                                         
+		</div>
+	{% else %}
+		<div class="container-fluid col-md-12 left-title" style="margin-bottom:20px !important;padding:0px;">                              
+		<h4 class="title-h2">文章列表</h4>                                         
+		</div>
+	{% endif %}
+
+
+	<main id="main" class="site-main" role="main">
+
+		{% if article_list %}
+			{% for article in article_list %}
+	                {% load_article_detail article True user %}
+	        {% endfor %}
+	    {% else %}
+	    	<article id="post-21"  class="post-content post-21 post type-post status-publish format-standard hentry category-4 tag-5" style="padding:60px 0 60px 0;">
+                <header class="entry-header">
+                    <h3 class="archive-title">哎呀，暂时还没有发布<span style="color: red;">{{ tag_name }}</span>相关文章, 请换个页面试试!</h3>
+                </header>
+            </article>
+        {% endif %}
+		{% if page_obj.has_next or page_obj.has_previous %}
+		<nav class="navigation posts-navigation" role="navigation">
+			<h2 class="screen-reader-text">Posts navigation</h2>
+			<div class="nav-links">
+				<div class="row">
+					<div class="col-md-6 next-post">
+					{% if page_obj.has_previous %}
+						<a href="?page={{ page_obj.previous_page_number }}" >
+						<i class="fa fa-angle-double-left">
+						</i> NEWER POSTS</a>
+					{% endif %}
+					</div>
+					<div class="col-md-6 prev-post">
+					{% if page_obj.has_next %}		
+						<a href="?page={{ page_obj.next_page_number }}" > OLDER POST
+						<i class="fa fa-angle-double-right"></i>
+						</a>
+					{% endif %}
+					</div>
+				</div>		
+			</div>
+		</nav>
+		{% endif %}
+	</main>
+</div>
+{% endblock content %}
+
+
+{% block sidebar %}
+	{% load_sidebar user %}
+{% endblock sidebar %}

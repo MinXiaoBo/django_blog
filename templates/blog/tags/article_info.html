@@ -1,0 +1,68 @@
+{% load blog_tags %}
+<article id="post-21"  class="post-content post-21 post type-post status-publish format-standard hentry category-4 tag-5">
+
+<header class="entry-header">
+    {% if isindex %}
+        <span class="screen-reader-text">{{article.title}}</span>
+        <h2 class="entry-title">
+            <a href="{{ article.get_absolute_url }}" rel="bookmark">{{article.title}}</a>
+        </h2>
+    {% else %}
+        <span class="screen-reader-text">{{article.title}}</span>
+        <h2 class="entry-title">{{article.title}}</h2>
+    {% endif %}
+    <div class="entry-meta">
+        <h5 class="entry-date">
+            <i class="fa fa-calendar-o"></i>
+            <a href="{{ article.get_record_url }}" class="entry-date" pubdate><time class="entry-date updated" datetime="{{ article.created_time }}">{% datetimeformat article.created_time %} </a>
+
+            <span class="byline">
+                <span class="sep"></span><i class="fa fa-user"></i>
+                <span class="author vcard">
+                <a href="{{ article.author.get_absolute_url }}" class="url fn n" title="View all posts by {{ article.author.username }}" rel="author">{{ article.author.username }}</a>
+                </span>
+            </span> 
+
+            <i class="fa fa-comments-o"></i><span class="screen-reader-text"></span>
+            <a href="{{ article.get_absolute_url }}#comments" class="comments-link" rel="nofollow">{{ article.comment_set.count }} Comments</a>
+        </h5>
+    </div>
+</header>
+
+<div class="entry-summary">
+    {% if isindex %}
+        <p>{{ article.body|truncate }} ...</p>
+        <p class="read-more" style="margin-bottom: 50px;">
+            <a class="btn btn-default" href="{{ article.get_absolute_url }}"> Read More<span class="screen-reader-text">  Read More</span>
+            </a>
+        </p>
+    {% else %}
+        <p>{{ article.body|custom_markdown }}</p>
+    {% endif %}
+</div>
+{% if not isindex %}
+<footer class="entry-footer">
+    <hr>
+    <div class="row">
+        <div class="col-md-6 cattegories">
+            <span class="cat-links">
+            <i class="fa fa-folder-open"></i>
+            <a href="{{ article.category.get_absolute_url }}" rel="category">{{ article.category }}</a></span>
+        </div>
+        <div class="col-md-6 tags">
+            {% for t in article.tags.all %}
+                <span class="tags-links">
+                    <i class="fa fa-tags"></i> 
+                    <a href="{{ t.get_absolute_url }}" rel="tag">{{ t.name }}</a>
+                </span>
+                {% if t != article.tags.all.last %}
+                    
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+</footer>
+{% endif %}
+</article>
+
+
